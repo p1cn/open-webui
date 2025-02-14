@@ -19,12 +19,12 @@ ENV http_proxy="http://10.10.1.81:2345" \
     VECTOR_DB="pgvector" \
     PGVECTOR_DB_URL="postgresql://dbuser_staging:DBUser.Staging@10.10.1.146:6432/ttx-oi"
 
-RUN curl -O https://sqlite.org/2021/sqlite-autoconf-3350000.tar.gz
-RUN tar -xvzf sqlite-autoconf-3350000.tar.gz
-RUN cd sqlite-autoconf-3350000
-RUN ./configure
-RUN make
-RUN make install
+RUN curl -O https://sqlite.org/2021/sqlite-autoconf-3350000.tar.gz && \
+    tar -xvzf sqlite-autoconf-3350000.tar.gz && \
+    cd sqlite-autoconf-3350000 && \
+    ./configure && \
+    make && \
+    make install
 
 
 COPY . /
