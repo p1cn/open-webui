@@ -9,9 +9,7 @@ ARG service
 FROM hub.p1.cn/cicd/lingualink_base:v1
 
 COPY backend/requirements.txt /
-RUN apt-get update && \
-    apt-get install -y \
-    sqlite3
+
 RUN python3 -m pip install -i https://pypi.tuna.tsinghua.edu.cn/simple -U pip
 RUN python3 -m pip install -i https://pypi.tuna.tsinghua.edu.cn/simple -r requirements.txt
 
@@ -20,6 +18,10 @@ ENV http_proxy="http://10.10.1.81:2345" \
     DATABASE_URL="postgresql://dbuser_staging:DBUser.Staging@10.10.1.146:6432/ttx-oi" \
     VECTOR_DB="pgvector" \
     PGVECTOR_DB_URL="postgresql://dbuser_staging:DBUser.Staging@10.10.1.146:6432/ttx-oi"
+
+RUN apt-get update && \
+    apt-get install -y \
+    sqlite3
 
 COPY . /
 COPY deploy/backend/test/entrypoint.sh /

@@ -9,9 +9,6 @@ ARG service
 FROM hub.p1.cn/cicd/lingualink_base:v1
 
 COPY backend/requirements.txt /
-RUN apt-get update && \
-    apt-get install -y \
-    sqlite3
 RUN python3 -m pip install -i https://pypi.tuna.tsinghua.edu.cn/simple -U pip
 RUN python3 -m pip install -i https://pypi.tuna.tsinghua.edu.cn/simple -r requirements.txt
 
@@ -20,6 +17,10 @@ ENV http_proxy="http://10.10.1.81:2345" \
     DATABASE_URL="pending" \
     VECTOR_DB="pgvector" \
     PGVECTOR_DB_URL="pending"
+
+RUN apt-get update && \
+    apt-get install -y \
+    sqlite3
 
 COPY . /
 COPY deploy/backend/prod/entrypoint.sh /
