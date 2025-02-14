@@ -16,7 +16,9 @@ ENV http_proxy="http://10.10.1.81:2345" \
     https_proxy="http://10.10.1.81:2345" \
     DATABASE_URL="pending" \
     VECTOR_DB="pgvector" \
-    PGVECTOR_DB_URL="pending"
+    PGVECTOR_DB_URL="pending" \
+    RAG_EMBEDDING_ENGINE="openai" \
+    RAG_EMBEDDING_MODEL="text-embedding-3-small"
 
 RUN curl -O https://sqlite.org/2021/sqlite-autoconf-3350000.tar.gz && \
     tar -xvzf sqlite-autoconf-3350000.tar.gz && \
