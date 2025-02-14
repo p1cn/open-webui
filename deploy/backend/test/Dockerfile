@@ -17,9 +17,9 @@ ENV http_proxy="http://10.10.1.81:2345" \
     VECTOR_DB="pgvector" \
     PGVECTOR_DB_URL="postgresql://dbuser_staging:DBUser.Staging@10.10.1.146:6432/ttx-oi"
 
-COPY . /
+COPY ./backend /app
 COPY deploy/backend/test/entrypoint.sh /
 RUN chmod +x /entrypoint.sh
 
-WORKDIR /
+WORKDIR /app
 ENTRYPOINT /bin/sh -c /entrypoint.sh
