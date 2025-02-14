@@ -9,6 +9,9 @@ ARG service
 FROM hub.p1.cn/cicd/lingualink_base:v1
 
 COPY backend/requirements.txt /
+RUN apt-get update && \
+    apt-get install -y \
+    sqlite3
 RUN python3 -m pip install -i https://pypi.tuna.tsinghua.edu.cn/simple -U pip
 RUN python3 -m pip install -i https://pypi.tuna.tsinghua.edu.cn/simple -r requirements.txt
 
