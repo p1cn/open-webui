@@ -35,7 +35,17 @@ spec:
       containers:
         - env:
             - name: APP_ENV
-              value: prod
+              value: test
+            - name: http_proxy
+              value: http://10.10.1.81:2345
+            - name: https_proxy
+              value: http://10.10.1.81:2345
+            - name: DATABASE_URL
+              value: postgresql://dbuser_staging:DBUser.Staging@10.10.1.146:6432/ttx-oi
+            - name: VECTOR_DB
+              value: pgvector
+            - name: PGVECTOR_DB_URL
+              value: postgresql://dbuser_staging:DBUser.Staging@10.10.1.146:6432/ttx-oi
           image: { { image-url } }
           imagePullPolicy: IfNotPresent
           livenessProbe:
@@ -61,8 +71,8 @@ spec:
             timeoutSeconds: 10
           resources:
             limits:
-              cpu: '8'
-              memory: 16Gi
+              cpu: '16'
+              memory: 32Gi
             requests:
               cpu: '1m'
               memory: 1Mi
