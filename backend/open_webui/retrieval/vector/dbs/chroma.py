@@ -1,6 +1,6 @@
-import chromadb
-from chromadb import Settings
-from chromadb.utils.batch_utils import create_batches
+# import chromadb
+# from chromadb import Settings
+# from chromadb.utils.batch_utils import create_batches
 
 from typing import Optional
 
@@ -31,23 +31,23 @@ class ChromaClient:
                 CHROMA_CLIENT_AUTH_CREDENTIALS
             )
 
-        if CHROMA_HTTP_HOST != "":
-            self.client = chromadb.HttpClient(
-                host=CHROMA_HTTP_HOST,
-                port=CHROMA_HTTP_PORT,
-                headers=CHROMA_HTTP_HEADERS,
-                ssl=CHROMA_HTTP_SSL,
-                tenant=CHROMA_TENANT,
-                database=CHROMA_DATABASE,
-                settings=Settings(**settings_dict),
-            )
-        else:
-            self.client = chromadb.PersistentClient(
-                path=CHROMA_DATA_PATH,
-                settings=Settings(**settings_dict),
-                tenant=CHROMA_TENANT,
-                database=CHROMA_DATABASE,
-            )
+        # if CHROMA_HTTP_HOST != "":
+        # self.client = chromadb.HttpClient(
+        #     host=CHROMA_HTTP_HOST,
+        #     port=CHROMA_HTTP_PORT,
+        #     headers=CHROMA_HTTP_HEADERS,
+        #     ssl=CHROMA_HTTP_SSL,
+        #     tenant=CHROMA_TENANT,
+        #     database=CHROMA_DATABASE,
+        #     settings=Settings(**settings_dict),
+        # )
+        # else:
+        # self.client = chromadb.PersistentClient(
+        #     path=CHROMA_DATA_PATH,
+        #     settings=Settings(**settings_dict),
+        #     tenant=CHROMA_TENANT,
+        #     database=CHROMA_DATABASE,
+        # )
 
     def has_collection(self, collection_name: str) -> bool:
         # Check if the collection exists based on the collection name.
