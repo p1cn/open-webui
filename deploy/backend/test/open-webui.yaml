@@ -2,8 +2,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: 'gpt-lingualink-rest'
-  name: 'gpt-lingualink-rest'
+    app: 'gpt-oi-rest'
+  name: 'gpt-oi-rest'
   namespace: default
 spec:
   capacity:
@@ -19,7 +19,7 @@ spec:
   revisionHistoryLimit: 10
   selector:
     matchLabels:
-      app: 'gpt-lingualink-rest'
+      app: 'gpt-oi-rest'
   strategy:
     rollingUpdate:
       maxSurge: 25%
@@ -35,7 +35,7 @@ spec:
           terminationDrainDuration: 20s
           holdApplicationUntilProxyStarts: true
       labels:
-        app: open-webui
+        app: gpt-oi-rest
         org: gpt
         resource: container
     spec:
@@ -56,7 +56,7 @@ spec:
               port: 8080
               scheme: HTTP
             timeoutSeconds: 5
-          name: 'open-webui'
+          name: 'gpt-oi-rest'
           readinessProbe:
             failureThreshold: 2
             initialDelaySeconds: 5
