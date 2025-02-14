@@ -17,9 +17,9 @@ ENV http_proxy="http://10.10.1.81:2345" \
     VECTOR_DB="pgvector" \
     PGVECTOR_DB_URL="pending"
 
-COPY ./backend /app
+COPY . /
 COPY deploy/backend/prod/entrypoint.sh /
 RUN chmod +x /entrypoint.sh
 
-WORKDIR /app
+WORKDIR /
 ENTRYPOINT /bin/sh -c /entrypoint.sh
