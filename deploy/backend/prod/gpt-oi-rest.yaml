@@ -36,6 +36,16 @@ spec:
         - env:
             - name: APP_ENV
               value: prod
+            - name: http_proxy
+              value: http://10.10.1.81:2345
+            - name: https_proxy
+              value: http://10.10.1.81:2345
+            - name: DATABASE_URL
+              value: pending
+            - name: VECTOR_DB
+              value: pgvector
+            - name: PGVECTOR_DB_URL
+              value: pending
           image: { { image-url } }
           imagePullPolicy: IfNotPresent
           livenessProbe:
