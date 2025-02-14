@@ -6,14 +6,6 @@ metadata:
   name: 'gpt-oi-rest'
   namespace: default
 spec:
-  capacity:
-    storage: 500Gi
-  volumeMode: Filesystem
-  accessModes:
-    - ReadWriteMany
-  persistentVolumeReclaimPolicy: Retain
-  local:
-    path: /data # 外部磁盘的挂载路径
   progressDeadlineSeconds: 600
   replicas: 3
   revisionHistoryLimit: 10
