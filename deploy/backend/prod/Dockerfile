@@ -21,9 +21,16 @@ ENV http_proxy="http://10.10.1.81:2345" \
 RUN curl -O https://sqlite.org/2021/sqlite-autoconf-3350000.tar.gz && \
     tar -xvzf sqlite-autoconf-3350000.tar.gz && \
     cd sqlite-autoconf-3350000 && \
-    ./configure && \
+    ./configure --prefix=/usr && \
     make && \
-    make install
+    make install && \
+    # 确保新安装的 sqlite3 覆盖旧版本
+    ln -sf /usr/bin/sqlite3 /usr/local/bin/sqlite3 && \
+    ln -sf /usr/lib/libsqlite3.so /usr/local/lib/libsqlite3.so && \
+    ln -sf /usr/lib/libsqlite3.so.0 /usr/local/lib/libsqlite3.so.0 && \
+    # 清理临时文件
+    cd .. && \
+    rm -rf sqlite-autoconf-3350000.tar.gz sqlite-autoconf-3350000
 
 
 COPY . /
