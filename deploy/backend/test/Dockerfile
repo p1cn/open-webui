@@ -24,7 +24,7 @@ RUN curl -O https://sqlite.org/2021/sqlite-autoconf-3350000.tar.gz && \
     cd sqlite-autoconf-3350000 && \
     ./configure && \
     make && \
-    sudo make install
+    make install
 
 
 COPY . /
