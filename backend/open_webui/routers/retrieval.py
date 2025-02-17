@@ -687,11 +687,12 @@ def save_docs_to_vector_db(
     collection_name,
     metadata: Optional[dict] = None,
     overwrite: bool = False,
-    split: bool = True,
+    split: bool = False, # 默认不分割文件
     add: bool = False,
     user=None,
 ) -> bool:
-    def _get_docs_info(docs: list[Document]) -> str:
+    log.info(f"save_docs_to_vector_db: {collection_name}, split: {split}, docs len: {len(docs)}")
+    def _get_docs_info(docs: list￼) -> str:
         docs_info = set()
 
         # Trying to select relevant metadata identifying the document.
@@ -708,7 +709,7 @@ def save_docs_to_vector_db(
         return ", ".join(docs_info)
 
     log.info(
-        f"save_docs_to_vector_db: document {_get_docs_info(docs)} {collection_name}"
+        f"save_docs_to_vector_db: document {_get_docs_info(docs)} {collection_name}, len docs: {len(docs)}"
     )
 
     # Check if entries with the same hash (metadata.hash) already exist
@@ -747,6 +748,8 @@ def save_docs_to_vector_db(
             raise ValueError(ERROR_MESSAGES.DEFAULT("Invalid text splitter"))
 
         docs = text_splitter.split_documents(docs)
+
+    log.info(f"got {len(docs)} documents")
 
     if len(docs) == 0:
         raise ValueError(ERROR_MESSAGES.EMPTY_CONTENT)
@@ -854,6 +857,7 @@ def process_file(
             collection_name = f"file-{file.id}"
 
         if form_data.content:
+            log.info(f"using form data content for file {file.filename}")
             # Update the content in the file
             # Usage: /files/{file_id}/data/content/update
 
@@ -874,6 +878,7 @@ def process_file(
 
             text_content = form_data.content
         elif form_data.collection_name:
+            log.info(f"using existing collection for file {file.filename}")
             # Check if the file has already been processed and save the content
             # Usage: /knowledge/{id}/file/add, /knowledge/{id}/file/update
 
@@ -905,6 +910,7 @@ def process_file(
 
             text_content = file.data.get("content", "")
         else:
+            log.info(f"using loader for file {file.filename}")
             # Process the file and save the content
             # Usage: /files/
             file_path = file.path
@@ -933,6 +939,7 @@ def process_file(
                     for doc in docs
                 ]
             else:
+                log.info(f"direclty using file content for file {file.filename}")
                 docs = [
                     Document(
                         page_content=file.data.get("content", ""),
@@ -947,7 +954,6 @@ def process_file(
                 ]
             text_content = " ".join([doc.page_content for doc in docs])
 
-        log.debug(f"text_content: {text_content}")
         Files.update_file_data_by_id(
             file.id,
             {"content": text_content},
@@ -1552,12 +1558,12 @@ def process_files_batch(
     collection_name = form_data.collection_name
 
     # Prepare all documents first
-    all_docs: List[Document] = []
+    all_docs: List￼ = []
     for file in form_data.files:
         try:
             text_content = file.data.get("content", "")
 
-            docs: List[Document] = [
+            docs: List￼ = [
                 Document(
                     page_content=text_content.replace("<br/>", "\n"),
                     metadata={
@@ -1612,3 +1618,4 @@ def process_files_batch(
                 )
 
     return BatchProcessFilesResponse(results=results, errors=errors)
+
