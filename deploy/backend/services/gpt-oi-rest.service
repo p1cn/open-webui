@@ -8,7 +8,7 @@ User=root
 Restart=on-failure
 LimitNOFILE=102400
 WorkingDirectory=/app/gpt-oi-rest/current
-ExecStart=docker run -v /data/docker_data:/backend/data -p 9090:8080 hub-proxy.p1.cn/{{tag}}
+ExecStart=docker-compose up -d --force-recreate --remove-orphans
 
 [Install]
 WantedBy=multi-user.target
