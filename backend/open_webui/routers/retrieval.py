@@ -692,7 +692,7 @@ def save_docs_to_vector_db(
     user=None,
 ) -> bool:
     log.info(f"save_docs_to_vector_db: {collection_name}, split: {split}, docs len: {len(docs)}")
-    def _get_docs_info(docs: list￼) -> str:
+    def _get_docs_info(docs: list) -> str:
         docs_info = set()
 
         # Trying to select relevant metadata identifying the document.
@@ -954,6 +954,7 @@ def process_file(
                 ]
             text_content = " ".join([doc.page_content for doc in docs])
 
+        log.debug(f"text_content: {text_content}")
         Files.update_file_data_by_id(
             file.id,
             {"content": text_content},
