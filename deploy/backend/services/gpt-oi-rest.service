@@ -8,7 +8,7 @@ User=root
 Restart=on-failure
 LimitNOFILE=102400
 WorkingDirectory=/app/gpt-oi-rest/current
-ExecStart=/data/bin/docker-compose up -d --force-recreate --remove-orphans -p gpt-oi-rest
+ExecStart=/data/bin/docker-compose -p gpt-oi-rest up -d --force-recreate --remove-orphans
 
 [Install]
 WantedBy=multi-user.target
