@@ -68,7 +68,7 @@ class VectorSearchRetriever(BaseRetriever):
 def query_doc(
     collection_name: str, query_embedding: list[float], k: int, user: UserModel = None
 ):
-    log.info(f"temp log query_doc: {collection_name} {k}")
+    # log.info(f"log query_doc: {collection_name} {k}")
     try:
         result = VECTOR_DB_CLIENT.search(
             collection_name=collection_name,
@@ -187,7 +187,7 @@ def query_collection(
     embedding_function,
     k: int,
 ) -> dict:
-    log.info("temp log query_collection: " + f"{collection_names} {queries} {k}")
+    # log.info("log query_collection: " + f"{collection_names} {queries} {k}")
     results = []
     for query in queries:
         query_embedding = embedding_function(query)
@@ -300,7 +300,7 @@ def get_sources_from_files(
     r,
     hybrid_search,
 ):
-    log.info(f"files: {files} {queries} {embedding_function} {reranking_function}")
+    log.debug(f"files: {files} {queries} {embedding_function} {reranking_function}")
 
     return [
         {
