@@ -1558,12 +1558,12 @@ def process_files_batch(
     collection_name = form_data.collection_name
 
     # Prepare all documents first
-    all_docs: List[Document]￼= []
+    all_docs: List[Document] = []
     for file in form_data.files:
         try:
             text_content = file.data.get("content", "")
 
-            docs: List[Document]￼ = [
+            docs: List[Document]￼= [
                 Document(
                     page_content=text_content.replace("<br/>", "\n"),
                     metadata={
@@ -1618,4 +1618,3 @@ def process_files_batch(
                 )
 
     return BatchProcessFilesResponse(results=results, errors=errors)
-
