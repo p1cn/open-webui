@@ -568,7 +568,7 @@ async def chat_completion_files_handler(
         except Exception as e:
             log.exception(e)
 
-        log.debug(f"rag_contexts:sources: {sources}")
+        log.info(f"sources: {json.dumps(sources,ensure_ascii=False)}")
 
     return body, {"sources": sources}
 
@@ -794,10 +794,11 @@ async def process_chat_payload(request, form_data, metadata, user, model):
         context_string = ""
         for source_idx, source in enumerate(sources):
             source_id = source.get("source", {}).get("name", "")
-
+            log.info(f"source_idx = {source_idx}, source_id = {source_id}")
             if "document" in source:
                 for doc_idx, doc_context in enumerate(source["document"]):
-                    context_string += f"<source><source_id>{source_idx}</source_id><source_context>{doc_context}</source_context></source>\n"
+                    log.info(f"doc_idx = {doc_idx}")
+                    context_string += f"<source><source_id>{doc_idx}</source_id><source_context>{doc_context}</source_context></source>\n"
 
         context_string = context_string.strip()
         prompt = get_last_user_message(form_data["messages"])

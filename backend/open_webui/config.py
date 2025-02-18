@@ -1769,7 +1769,7 @@ RAG_WEB_SEARCH_ENGINE = PersistentConfig(
 RAG_WEB_SEARCH_FULL_CONTEXT = PersistentConfig(
     "RAG_WEB_SEARCH_FULL_CONTEXT",
     "rag.web.search.full_context",
-    os.getenv("RAG_WEB_SEARCH_FULL_CONTEXT", "False").lower() == "true",
+    os.getenv("RAG_WEB_SEARCH_FULL_CONTEXT", "true").lower() == "true",
 )
 
 # You can provide a list of your own websites to filter after performing a web search.
