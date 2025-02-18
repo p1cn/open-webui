@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 import uuid
@@ -300,7 +301,9 @@ def get_sources_from_files(
     r,
     hybrid_search,
 ):
-    log.debug(f"files: {files} {queries} {embedding_function} {reranking_function}")
+    log.info(
+        f"files: {json.dumps(files, ensure_ascii=False)};\nqueries: {queries}\nembedding_function: {embedding_function}\nreranking_function: {reranking_function}"
+    )
 
     return [
         {

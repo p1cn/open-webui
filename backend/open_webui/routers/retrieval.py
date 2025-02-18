@@ -1036,7 +1036,7 @@ def process_text(
         )
     ]
     text_content = form_data.content
-    log.debug(f"text_content: {text_content}")
+    log.info(f"text_content: {text_content}")
 
     result = save_docs_to_vector_db(request, docs, collection_name, user=user)
     if result:
@@ -1069,7 +1069,7 @@ def process_youtube_video(
 
         docs = loader.load()
         content = " ".join([doc.page_content for doc in docs])
-        log.debug(f"text_content: {content}")
+        log.info(f"youtube text_content: {content}")
 
         save_docs_to_vector_db(
             request, docs, collection_name, overwrite=True, user=user
@@ -1113,7 +1113,7 @@ def process_web(
         docs = loader.load()
         content = " ".join([doc.page_content for doc in docs])
 
-        log.debug(f"text_content: {content}")
+        log.info(f"process_web text_content: {content}")
         save_docs_to_vector_db(
             request, docs, collection_name, overwrite=True, user=user
         )
@@ -1340,7 +1340,7 @@ async def process_web_search(
             detail=ERROR_MESSAGES.WEB_SEARCH_ERROR(e),
         )
 
-    log.debug(f"web_results: {web_results}")
+    log.info(f"process_web_search web_results: {web_results}")
 
     try:
         collection_name = form_data.collection_name
@@ -1618,6 +1618,8 @@ def process_files_batch(
             errors.append(
                 BatchProcessFilesResult(file_id=file.id, status="failed", error=str(e))
             )
+
+    log.info(f"process_files_batch: Prepared {len(all_docs)} documents")
 
     # Save all documents in one batch
     if all_docs:

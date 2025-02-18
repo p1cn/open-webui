@@ -322,6 +322,7 @@ async def chat_web_search_handler(
         return form_data
 
     searchQuery = queries[0]
+    log.info(f"generate searchQuery: {searchQuery}")
 
     await event_emitter(
         {
@@ -336,7 +337,7 @@ async def chat_web_search_handler(
     )
 
     try:
-
+        log.info(f"begin to process_web_search: {searchQuery}")
         results = await process_web_search(
             request,
             SearchForm(
@@ -347,6 +348,7 @@ async def chat_web_search_handler(
             user,
         )
 
+        log.info(f"end to process_web_search, results: {results}")
         if results:
             await event_emitter(
                 {
@@ -712,6 +714,7 @@ async def process_chat_payload(request, form_data, metadata, user, model):
     features = form_data.pop("features", None)
     if features:
         if "web_search" in features and features["web_search"]:
+            log.info("Web search feature is enabled")
             form_data = await chat_web_search_handler(
                 request, form_data, extra_params, user
             )
