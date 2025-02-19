@@ -99,9 +99,7 @@ class SafeWebBaseLoader(WebBaseLoader):
                         if self.raise_for_status:
                             response.raise_for_status()
                         content = await response.text()
-                        log.info(
-                            f"Successfully fetched {url}, content : {content[:100]}"
-                        )
+                        log.info(f"Successfully fetched {url}")
                         return content
                 except aiohttp.ClientConnectionError as e:
                     if i == retries - 1:
@@ -111,7 +109,7 @@ class SafeWebBaseLoader(WebBaseLoader):
                             f"Error fetching {url} with attempt "
                             f"{i + 1}/{retries}: {e}. Retrying..."
                         )
-                        await asyncio.sleep(cooldown * backoff**i)
+                        # await asyncio.sleep(cooldown * backoff**i)
                 except Exception as e:
                     log.error(f"Error fetching {url}: {e}")
                     raise
@@ -202,7 +200,6 @@ def get_web_loader(
     requests_per_second: int = 2,
     trust_env: bool = True,
 ):
-    log.info(f"trust_env: {trust_env}")
     # Check if the URLs are valid
     safe_urls = safe_validate_urls([urls] if isinstance(urls, str) else urls)
 
