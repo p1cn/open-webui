@@ -1037,7 +1037,7 @@ def process_text(
         )
     ]
     text_content = form_data.content
-    log.info(f"text_content: {text_content}")
+    log.debug(f"text_content: {text_content}")
 
     result = save_docs_to_vector_db(request, docs, collection_name, user=user)
     if result:
@@ -1070,7 +1070,7 @@ def process_youtube_video(
 
         docs = loader.load()
         content = " ".join([doc.page_content for doc in docs])
-        log.info(f"youtube text_content: {content}")
+        log.debug(f"youtube text_content: {content}")
 
         save_docs_to_vector_db(
             request, docs, collection_name, overwrite=True, user=user
@@ -1114,7 +1114,7 @@ def process_web(
         docs = loader.load()
         content = " ".join([doc.page_content for doc in docs])
 
-        log.info(f"process_web text_content: {content}")
+        log.debug(f"process_web text_content: {content}")
         save_docs_to_vector_db(
             request, docs, collection_name, overwrite=True, user=user
         )
