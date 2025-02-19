@@ -10,6 +10,8 @@
 	</div>
 
 	<div class=" self-center text-sm">
-		{typeof content === 'string' ? content : JSON.stringify(content)}
+		{console.log('Rendered content:', content)}
+		<!-- content 不为 json 的处理补全 -->
+		{typeof content === 'string' ? content : (c=>{try{return JSON.stringify(c,(k,v)=>v===undefined?'undefined':v instanceof Node?'[Node]':typeof v==='function'?'[Function]':v)}catch(e){return`[Serialization Error: ${e.message}]`}})(content)}
 	</div>
 </div>
