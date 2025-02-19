@@ -2,12 +2,14 @@ import json
 import logging
 import os
 import shutil
+import base64
+
 from datetime import datetime
 from pathlib import Path
 from typing import Generic, Optional, TypeVar
 from urllib.parse import urlparse
 
-import chromadb
+# import chromadb
 import requests
 from pydantic import BaseModel
 from sqlalchemy import JSON, Column, DateTime, Integer, func
@@ -593,8 +595,6 @@ if frontend_favicon.exists():
         shutil.copyfile(frontend_favicon, STATIC_DIR / "favicon.png")
     except Exception as e:
         logging.error(f"An error occurred: {e}")
-else:
-    logging.warning(f"Frontend favicon not found at {frontend_favicon}")
 
 frontend_splash = FRONTEND_BUILD_DIR / "static" / "splash.png"
 
@@ -603,12 +603,18 @@ if frontend_splash.exists():
         shutil.copyfile(frontend_splash, STATIC_DIR / "splash.png")
     except Exception as e:
         logging.error(f"An error occurred: {e}")
-else:
-    logging.warning(f"Frontend splash not found at {frontend_splash}")
+
+frontend_loader = FRONTEND_BUILD_DIR / "static" / "loader.js"
+
+if frontend_loader.exists():
+    try:
+        shutil.copyfile(frontend_loader, STATIC_DIR / "loader.js")
+    except Exception as e:
+        logging.error(f"An error occurred: {e}")
 
 
 ####################################
-# CUSTOM_NAME
+# CUSTOM_NAME (Legacy)
 ####################################
 
 CUSTOM_NAME = os.environ.get("CUSTOM_NAME", "")
@@ -649,6 +655,16 @@ if CUSTOM_NAME:
         log.exception(e)
         pass
 
+
+####################################
+# LICENSE_KEY
+####################################
+
+LICENSE_KEY = PersistentConfig(
+    "LICENSE_KEY",
+    "license.key",
+    os.environ.get("LICENSE_KEY", ""),
+)
 
 ####################################
 # STORAGE PROVIDER
@@ -1229,7 +1245,7 @@ Analyze the chat history to determine the necessity of generating search queries
 - Always prioritize providing actionable and broad queries that maximize informational coverage.
 
 ### Output:
-Strictly return in JSON format: 
+Strictly return in JSON format:
 {
   "queries": ["query1", "query2"]
 }
@@ -1260,44 +1276,44 @@ AUTOCOMPLETE_GENERATION_PROMPT_TEMPLATE = PersistentConfig(
 
 
 DEFAULT_AUTOCOMPLETE_GENERATION_PROMPT_TEMPLATE = """### Task:
-You are an autocompletion system. Continue the text in `<text>` based on the **completion type** in `<type>` and the given language.  
+You are an autocompletion system. Continue the text in `<text>` based on the **completion type** in `<type>` and the given language.
 
 ### **Instructions**:
-1. Analyze `<text>` for context and meaning.  
-2. Use `<type>` to guide your output:  
-   - **General**: Provide a natural, concise continuation.  
-   - **Search Query**: Complete as if generating a realistic search query.  
-3. Start as if you are directly continuing `<text>`. Do **not** repeat, paraphrase, or respond as a model. Simply complete the text.  
+1. Analyze `<text>` for context and meaning.
+2. Use `<type>` to guide your output:
+   - **General**: Provide a natural, concise continuation.
+   - **Search Query**: Complete as if generating a realistic search query.
+3. Start as if you are directly continuing `<text>`. Do **not** repeat, paraphrase, or respond as a model. Simply complete the text.
 4. Ensure the continuation:
-   - Flows naturally from `<text>`.  
-   - Avoids repetition, overexplaining, or unrelated ideas.  
-5. If unsure, return: `{ "text": "" }`.  
+   - Flows naturally from `<text>`.
+   - Avoids repetition, overexplaining, or unrelated ideas.
+5. If unsure, return: `{ "text": "" }`.
 
 ### **Output Rules**:
 - Respond only in JSON format: `{ "text": "<your_completion>" }`.
 
 ### **Examples**:
-#### Example 1:  
-Input:  
-<type>General</type>  
-<text>The sun was setting over the horizon, painting the sky</text>  
-Output:  
+#### Example 1:
+Input:
+<type>General</type>
+<text>The sun was setting over the horizon, painting the sky</text>
+Output:
 { "text": "with vibrant shades of orange and pink." }
 
-#### Example 2:  
-Input:  
-<type>Search Query</type>  
-<text>Top-rated restaurants in</text>  
-Output:  
-{ "text": "New York City for Italian cuisine." }  
+#### Example 2:
+Input:
+<type>Search Query</type>
+<text>Top-rated restaurants in</text>
+Output:
+{ "text": "New York City for Italian cuisine." }
 
 ---
 ### Context:
 <chat_history>
 {{MESSAGES:END:6}}
 </chat_history>
-<type>{{TYPE}}</type>  
-<text>{{PROMPT}}</text>  
+<type>{{TYPE}}</type>
+<text>{{PROMPT}}</text>
 #### Output:
 """
 
@@ -1314,7 +1330,7 @@ Your task is to choose and return the correct tool(s) from the list of available
 
 - Return only the JSON object, without any additional text or explanation.
 
-- If no tools match the query, return an empty array: 
+- If no tools match the query, return an empty array:
    {
      "tool_calls": []
    }
@@ -1347,6 +1363,39 @@ Responses from models: {{responses}}"""
 # Code Interpreter
 ####################################
 
+
+CODE_EXECUTION_ENGINE = PersistentConfig(
+    "CODE_EXECUTION_ENGINE",
+    "code_execution.engine",
+    os.environ.get("CODE_EXECUTION_ENGINE", "pyodide"),
+)
+
+CODE_EXECUTION_JUPYTER_URL = PersistentConfig(
+    "CODE_EXECUTION_JUPYTER_URL",
+    "code_execution.jupyter.url",
+    os.environ.get("CODE_EXECUTION_JUPYTER_URL", ""),
+)
+
+CODE_EXECUTION_JUPYTER_AUTH = PersistentConfig(
+    "CODE_EXECUTION_JUPYTER_AUTH",
+    "code_execution.jupyter.auth",
+    os.environ.get("CODE_EXECUTION_JUPYTER_AUTH", ""),
+)
+
+CODE_EXECUTION_JUPYTER_AUTH_TOKEN = PersistentConfig(
+    "CODE_EXECUTION_JUPYTER_AUTH_TOKEN",
+    "code_execution.jupyter.auth_token",
+    os.environ.get("CODE_EXECUTION_JUPYTER_AUTH_TOKEN", ""),
+)
+
+
+CODE_EXECUTION_JUPYTER_AUTH_PASSWORD = PersistentConfig(
+    "CODE_EXECUTION_JUPYTER_AUTH_PASSWORD",
+    "code_execution.jupyter.auth_password",
+    os.environ.get("CODE_EXECUTION_JUPYTER_AUTH_PASSWORD", ""),
+)
+
+
 ENABLE_CODE_INTERPRETER = PersistentConfig(
     "ENABLE_CODE_INTERPRETER",
     "code_interpreter.enable",
@@ -1368,26 +1417,37 @@ CODE_INTERPRETER_PROMPT_TEMPLATE = PersistentConfig(
 CODE_INTERPRETER_JUPYTER_URL = PersistentConfig(
     "CODE_INTERPRETER_JUPYTER_URL",
     "code_interpreter.jupyter.url",
-    os.environ.get("CODE_INTERPRETER_JUPYTER_URL", ""),
+    os.environ.get(
+        "CODE_INTERPRETER_JUPYTER_URL", os.environ.get("CODE_EXECUTION_JUPYTER_URL", "")
+    ),
 )
 
 CODE_INTERPRETER_JUPYTER_AUTH = PersistentConfig(
     "CODE_INTERPRETER_JUPYTER_AUTH",
     "code_interpreter.jupyter.auth",
-    os.environ.get("CODE_INTERPRETER_JUPYTER_AUTH", ""),
+    os.environ.get(
+        "CODE_INTERPRETER_JUPYTER_AUTH",
+        os.environ.get("CODE_EXECUTION_JUPYTER_AUTH", ""),
+    ),
 )
 
 CODE_INTERPRETER_JUPYTER_AUTH_TOKEN = PersistentConfig(
     "CODE_INTERPRETER_JUPYTER_AUTH_TOKEN",
     "code_interpreter.jupyter.auth_token",
-    os.environ.get("CODE_INTERPRETER_JUPYTER_AUTH_TOKEN", ""),
+    os.environ.get(
+        "CODE_INTERPRETER_JUPYTER_AUTH_TOKEN",
+        os.environ.get("CODE_EXECUTION_JUPYTER_AUTH_TOKEN", ""),
+    ),
 )
 
 
 CODE_INTERPRETER_JUPYTER_AUTH_PASSWORD = PersistentConfig(
     "CODE_INTERPRETER_JUPYTER_AUTH_PASSWORD",
     "code_interpreter.jupyter.auth_password",
-    os.environ.get("CODE_INTERPRETER_JUPYTER_AUTH_PASSWORD", ""),
+    os.environ.get(
+        "CODE_INTERPRETER_JUPYTER_AUTH_PASSWORD",
+        os.environ.get("CODE_EXECUTION_JUPYTER_AUTH_PASSWORD", ""),
+    ),
 )
 
 
@@ -1398,9 +1458,9 @@ DEFAULT_CODE_INTERPRETER_PROMPT = """
    - You have access to a Python shell that runs directly in the user's browser, enabling fast execution of code for analysis, calculations, or problem-solving.  Use it in this response.
    - The Python code you write can incorporate a wide array of libraries, handle data manipulation or visualization, perform API calls for web-related tasks, or tackle virtually any computational challenge. Use this flexibility to **think outside the box, craft elegant solutions, and harness Python's full potential**.
    - To use it, **you must enclose your code within `<code_interpreter type="code" lang="python">` XML tags** and stop right away. If you don't, the code won't execute. Do NOT use triple backticks.
-   - When coding, **always aim to print meaningful outputs** (e.g., results, tables, summaries, or visuals) to better interpret and verify the findings. Avoid relying on implicit outputs; prioritize explicit and clear print statements so the results are effectively communicated to the user.  
-   - After obtaining the printed output, **always provide a concise analysis, interpretation, or next steps to help the user understand the findings or refine the outcome further.**  
-   - If the results are unclear, unexpected, or require validation, refine the code and execute it again as needed. Always aim to deliver meaningful insights from the results, iterating if necessary.  
+   - When coding, **always aim to print meaningful outputs** (e.g., results, tables, summaries, or visuals) to better interpret and verify the findings. Avoid relying on implicit outputs; prioritize explicit and clear print statements so the results are effectively communicated to the user.
+   - After obtaining the printed output, **always provide a concise analysis, interpretation, or next steps to help the user understand the findings or refine the outcome further.**
+   - If the results are unclear, unexpected, or require validation, refine the code and execute it again as needed. Always aim to deliver meaningful insights from the results, iterating if necessary.
    - **If a link to an image, audio, or any file is provided in markdown format in the output, ALWAYS regurgitate word for word, explicitly display it as part of the response to ensure the user can access it easily, do NOT change the link.**
    - All responses should be communicated in the chat's primary language, ensuring seamless understanding. If the chat is multilingual, default to English for clarity.
 
@@ -1415,12 +1475,12 @@ VECTOR_DB = os.environ.get("VECTOR_DB", "chroma")
 
 # Chroma
 CHROMA_DATA_PATH = f"{DATA_DIR}/vector_db"
-CHROMA_TENANT = os.environ.get("CHROMA_TENANT", chromadb.DEFAULT_TENANT)
-CHROMA_DATABASE = os.environ.get("CHROMA_DATABASE", chromadb.DEFAULT_DATABASE)
+# CHROMA_TENANT = os.environ.get("CHROMA_TENANT", chromadb.DEFAULT_TENANT)
+# CHROMA_DATABASE = os.environ.get("CHROMA_DATABASE", chromadb.DEFAULT_DATABASE)
 CHROMA_HTTP_HOST = os.environ.get("CHROMA_HTTP_HOST", "")
 CHROMA_HTTP_PORT = int(os.environ.get("CHROMA_HTTP_PORT", "8000"))
-CHROMA_CLIENT_AUTH_PROVIDER = os.environ.get("CHROMA_CLIENT_AUTH_PROVIDER", "")
-CHROMA_CLIENT_AUTH_CREDENTIALS = os.environ.get("CHROMA_CLIENT_AUTH_CREDENTIALS", "")
+# CHROMA_CLIENT_AUTH_PROVIDER = os.environ.get("CHROMA_CLIENT_AUTH_PROVIDER", "")
+# CHROMA_CLIENT_AUTH_CREDENTIALS = os.environ.get("CHROMA_CLIENT_AUTH_CREDENTIALS", "")
 # Comma-separated list of header=value pairs
 CHROMA_HTTP_HEADERS = os.environ.get("CHROMA_HTTP_HEADERS", "")
 if CHROMA_HTTP_HEADERS:
@@ -1540,7 +1600,7 @@ ENABLE_RAG_WEB_LOADER_SSL_VERIFICATION = PersistentConfig(
 RAG_EMBEDDING_ENGINE = PersistentConfig(
     "RAG_EMBEDDING_ENGINE",
     "rag.embedding_engine",
-    os.environ.get("RAG_EMBEDDING_ENGINE", ""),
+    os.environ.get("RAG_EMBEDDING_ENGINE", "openai"),
 )
 
 PDF_EXTRACT_IMAGES = PersistentConfig(
@@ -1552,7 +1612,7 @@ PDF_EXTRACT_IMAGES = PersistentConfig(
 RAG_EMBEDDING_MODEL = PersistentConfig(
     "RAG_EMBEDDING_MODEL",
     "rag.embedding_model",
-    os.environ.get("RAG_EMBEDDING_MODEL", "sentence-transformers/all-MiniLM-L6-v2"),
+    os.environ.get("RAG_EMBEDDING_MODEL", "text-embedding-3-small"),
 )
 log.info(f"Embedding model set: {RAG_EMBEDDING_MODEL.value}")
 
@@ -1625,13 +1685,13 @@ Respond to the user query using the provided context, incorporating inline citat
 - Respond in the same language as the user's query.
 - If the context is unreadable or of poor quality, inform the user and provide the best possible answer.
 - If the answer isn't present in the context but you possess the knowledge, explain this to the user and provide the answer using your own understanding.
-- **Only include inline citations using [source_id] when a <source_id> tag is explicitly provided in the context.**  
-- Do not cite if the <source_id> tag is not provided in the context.  
+- **Only include inline citations using [source_id] when a <source_id> tag is explicitly provided in the context.**
+- Do not cite if the <source_id> tag is not provided in the context.
 - Do not use XML tags in your response.
 - Ensure citations are concise and directly related to the information provided.
 
 ### Example of Citation:
-If the user asks about a specific topic and the information is found in "whitepaper.pdf" with a provided <source_id>, the response should include the citation like so:  
+If the user asks about a specific topic and the information is found in "whitepaper.pdf" with a provided <source_id>, the response should include the citation like so:
 * "According to the study, the proposed method increases efficiency by 20% [whitepaper.pdf]."
 If no <source_id> is present, the response should omit the citation.
 
@@ -1731,6 +1791,12 @@ RAG_WEB_SEARCH_ENGINE = PersistentConfig(
     "RAG_WEB_SEARCH_ENGINE",
     "rag.web.search.engine",
     os.getenv("RAG_WEB_SEARCH_ENGINE", ""),
+)
+
+RAG_WEB_SEARCH_FULL_CONTEXT = PersistentConfig(
+    "RAG_WEB_SEARCH_FULL_CONTEXT",
+    "rag.web.search.full_context",
+    os.getenv("RAG_WEB_SEARCH_FULL_CONTEXT", "False").lower() == "true",
 )
 
 # You can provide a list of your own websites to filter after performing a web search.
@@ -1880,6 +1946,11 @@ RAG_WEB_SEARCH_CONCURRENT_REQUESTS = PersistentConfig(
     int(os.getenv("RAG_WEB_SEARCH_CONCURRENT_REQUESTS", "10")),
 )
 
+RAG_WEB_SEARCH_TRUST_ENV = PersistentConfig(
+    "RAG_WEB_SEARCH_TRUST_ENV",
+    "rag.web.search.trust_env",
+    os.getenv("RAG_WEB_SEARCH_TRUST_ENV", False),
+)
 
 ####################################
 # Images

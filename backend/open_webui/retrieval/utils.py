@@ -69,7 +69,7 @@ class VectorSearchRetriever(BaseRetriever):
 def query_doc(
     collection_name: str, query_embedding: list[float], k: int, user: UserModel = None
 ):
-    # log.info(f"query_doc: {collection_name} {k}")
+    # log.info(f"log query_doc: {collection_name} {k}")
     try:
         result = VECTOR_DB_CLIENT.search(
             collection_name=collection_name,
@@ -78,7 +78,7 @@ def query_doc(
         )
 
         if result:
-            log.debug(f"query_doc:result {result.ids} {result.metadatas}")
+            log.info(f"query_doc:result {result.ids} {result.metadatas}")
 
         return result
     except Exception as e:
@@ -188,7 +188,7 @@ def query_collection(
     embedding_function,
     k: int,
 ) -> dict:
-    # log.info("query_collection: " + f"{collection_names} {queries} {k}")
+    # log.info("log query_collection: " + f"{collection_names} {queries} {k}")
     results = []
     for query in queries:
         query_embedding = embedding_function(query)
@@ -301,15 +301,19 @@ def get_sources_from_files(
     r,
     hybrid_search,
 ):
-    log.debug(f"get_sources_from_files:args: {queries} {embedding_function} {k} {reranking_function} {r} {hybrid_search}")
-
+    log.debug(
+        f"get_sources_from_files:args: {queries} {embedding_function} {k} {reranking_function} {r} {hybrid_search}")
     log.debug(f"files: {json.dumps(files)}")
-
     extracted_collections = []
     relevant_contexts = []
 
     for file in files:
-        if file.get("context") == "full":
+        if file.get("docs"):
+            context = {
+                "documents": [[doc.get("content") for doc in file.get("docs")]],
+                "metadatas": [[doc.get("metadata") for doc in file.get("docs")]],
+            }
+        elif file.get("context") == "full":
             context = {
                 "documents": [[file.get("file").get("data", {}).get("content")]],
                 "metadatas": [[{"file_id": file.get("id"), "name": file.get("name")}]],
