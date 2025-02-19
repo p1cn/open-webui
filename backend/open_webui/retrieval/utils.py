@@ -342,7 +342,9 @@ def get_sources_from_files(
 
         else:
             # 处理未知类型（可选）
-            log.warning(f"Unknown file type: {file_type}")
+            log.warning(
+                f"Unknown file type: {file_type}\nfile: {json.dumps(file,ensure_ascii=False)}"
+            )
 
     return sources
 
