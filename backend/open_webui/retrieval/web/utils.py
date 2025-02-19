@@ -81,7 +81,7 @@ class SafeWebBaseLoader(WebBaseLoader):
         self.trust_env = trust_env
 
     async def _fetch(
-        self, url: str, retries: int = 3, cooldown: int = 2, backoff: float = 1.5
+        self, url: str, retries: int = 1, cooldown: int = 2, backoff: float = 1.5
     ) -> str:
         async with aiohttp.ClientSession(trust_env=self.trust_env) as session:
             for i in range(retries):
@@ -98,7 +98,11 @@ class SafeWebBaseLoader(WebBaseLoader):
                     ) as response:
                         if self.raise_for_status:
                             response.raise_for_status()
-                        return await response.text()
+                        content = await response.text()
+                        log.info(
+                            f"Successfully fetched {url}, content : {content[:100]}"
+                        )
+                        return content
                 except aiohttp.ClientConnectionError as e:
                     if i == retries - 1:
                         raise
@@ -108,6 +112,9 @@ class SafeWebBaseLoader(WebBaseLoader):
                             f"{i + 1}/{retries}: {e}. Retrying..."
                         )
                         await asyncio.sleep(cooldown * backoff**i)
+                except Exception as e:
+                    log.error(f"Error fetching {url}: {e}")
+                    raise
         raise ValueError("retry count exceeded")
 
     def _unpack_fetch_results(
@@ -118,14 +125,20 @@ class SafeWebBaseLoader(WebBaseLoader):
 
         final_results = []
         for i, result in enumerate(results):
-            url = urls[i]
-            if parser is None:
-                if url.endswith(".xml"):
-                    parser = "xml"
-                else:
-                    parser = self.default_parser
-                self._check_parser(parser)
-            final_results.append(BeautifulSoup(result, parser, **self.bs_kwargs))
+            try:
+                url = urls[i]
+                if parser is None:
+                    if url.endswith(".xml"):
+                        parser = "xml"
+                    else:
+                        parser = self.default_parser
+                    self._check_parser(parser)
+                final_results.append(BeautifulSoup(result, parser, **self.bs_kwargs))
+            except Exception as e:
+                log.error(
+                    f"Error parsing {url}: {e}\nparser: {parser}\n, result: {result}"
+                )
+                final_results.append(None)
         return final_results
 
     async def ascrape_all(
@@ -162,16 +175,20 @@ class SafeWebBaseLoader(WebBaseLoader):
         """Async lazy load text from the url(s) in web_path."""
         results = await self.ascrape_all(self.web_paths)
         for path, soup in zip(self.web_paths, results):
-            text = soup.get_text(**self.bs_get_text_kwargs)
-            metadata = {"source": path}
-            if title := soup.find("title"):
-                metadata["title"] = title.get_text()
-            if description := soup.find("meta", attrs={"name": "description"}):
-                metadata["description"] = description.get(
-                    "content", "No description found."
-                )
-            if html := soup.find("html"):
-                metadata["language"] = html.get("lang", "No language found.")
+            try:
+                text = soup.get_text(**self.bs_get_text_kwargs)
+                metadata = {"source": path}
+                if title := soup.find("title"):
+                    metadata["title"] = title.get_text()
+                if description := soup.find("meta", attrs={"name": "description"}):
+                    metadata["description"] = description.get(
+                        "content", "No description found."
+                    )
+                if html := soup.find("html"):
+                    metadata["language"] = html.get("lang", "No language found.")
+            except Exception as e:
+                # Log the error and continue with the next URL
+                log.error(f"Error loading {path}: {e}")
             yield Document(page_content=text, metadata=metadata)
 
     async def aload(self) -> list[Document]:
