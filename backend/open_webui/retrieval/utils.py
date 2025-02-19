@@ -631,3 +631,10 @@ class RerankCompressor(BaseDocumentCompressor):
             )
             final_results.append(doc)
         return final_results
+
+
+# remove_extra_line_breaks 去除一个文本中多余的换行
+def remove_extra_line_breaks(text):
+    lines = text.split("\n")
+    lines = [line for line in lines if line.strip()]
+    return "\n".join(lines)

@@ -68,6 +68,7 @@ from open_webui.retrieval.utils import (
     query_collection_with_hybrid_search,
     query_doc,
     query_doc_with_hybrid_search,
+    remove_extra_line_breaks,
 )
 from open_webui.utils.misc import (
     calculate_sha256_string,
@@ -1363,7 +1364,7 @@ async def process_web_search(
                 "status": True,
                 "docs": [
                     {
-                        "content": doc.page_content,
+                        "content": remove_extra_line_breaks(doc.page_content),
                         "metadata": doc.metadata,
                     }
                     for doc in docs
