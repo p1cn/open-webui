@@ -59,7 +59,11 @@ def safe_validate_urls(url: Sequence[str]) -> Sequence[str]:
 
 def resolve_hostname(hostname):
     # Get address information
-    addr_info = socket.getaddrinfo(hostname, None)
+    try:
+        addr_info = socket.getaddrinfo(hostname, None)
+    except socket.gaierror as e:
+        log.error(f"Error resolving hostname {hostname}: {e}")
+        return [], []
 
     # Extract IP addresses from address information
     ipv4_addresses = [info[4][0] for info in addr_info if info[0] == socket.AF_INET]
