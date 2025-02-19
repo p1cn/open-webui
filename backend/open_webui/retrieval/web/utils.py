@@ -185,6 +185,7 @@ def get_web_loader(
     requests_per_second: int = 2,
     trust_env: bool = True,
 ):
+    log.info(f"trust_env: {trust_env}")
     # Check if the URLs are valid
     safe_urls = safe_validate_urls([urls] if isinstance(urls, str) else urls)
 
