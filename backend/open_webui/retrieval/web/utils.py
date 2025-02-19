@@ -87,7 +87,10 @@ class SafeWebBaseLoader(WebBaseLoader):
     async def _fetch(
         self, url: str, retries: int = 1, cooldown: int = 2, backoff: float = 1.5
     ) -> str:
-        async with aiohttp.ClientSession(trust_env=self.trust_env) as session:
+        timeout = aiohttp.ClientTimeout(total=2)
+        async with aiohttp.ClientSession(
+            trust_env=self.trust_env, timeout=timeout
+        ) as session:
             for i in range(retries):
                 try:
                     kwargs: Dict = dict(
@@ -201,9 +204,10 @@ class SafeWebBaseLoader(WebBaseLoader):
 def get_web_loader(
     urls: Union[str, Sequence[str]],
     verify_ssl: bool = True,
-    requests_per_second: int = 2,
+    requests_per_second: int = 20,
     trust_env: bool = True,
 ):
+    log.info(f"trust_env: {trust_env}; requests_per_second: {requests_per_second}")
     # Check if the URLs are valid
     safe_urls = safe_validate_urls([urls] if isinstance(urls, str) else urls)
 
