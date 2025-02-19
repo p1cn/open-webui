@@ -1564,7 +1564,7 @@ def process_files_batch(
         try:
             text_content = file.data.get("content", "")
 
-            docs: List[Document]￼= [
+            docs: List[Document] = [
                 Document(
                     page_content=text_content.replace("<br/>", "\n"),
                     metadata={

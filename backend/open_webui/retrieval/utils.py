@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 import uuid
@@ -77,7 +78,7 @@ def query_doc(
         )
 
         if result:
-            log.info(f"query_doc:result {result.ids} {result.metadatas}")
+            log.debug(f"query_doc:result {result.ids} {result.metadatas}")
 
         return result
     except Exception as e:
@@ -300,14 +301,9 @@ def get_sources_from_files(
     r,
     hybrid_search,
 ):
-    log.debug(f"files: {files} {queries} {embedding_function} {reranking_function}")
+    log.debug(f"get_sources_from_files:args: {queries} {embedding_function} {k} {reranking_function} {r} {hybrid_search}")
 
-    return [
-        {"source": file["file"],
-         "document": [file["file"]["data"]["content"]],
-         "metadata": [{"file_id": file["file"]["id"], "name": file["file"]["filename"]}]}
-        for file in files
-    ]
+    log.debug(f"files: {json.dumps(files)}")
 
     extracted_collections = []
     relevant_contexts = []
@@ -347,6 +343,7 @@ def get_sources_from_files(
                 else:
                     if hybrid_search:
                         try:
+                            log.debug(f"hybrid search: {collection_names} {queries}")
                             context = query_collection_with_hybrid_search(
                                 collection_names=collection_names,
                                 queries=queries,
@@ -355,6 +352,7 @@ def get_sources_from_files(
                                 reranking_function=reranking_function,
                                 r=r,
                             )
+                            log.debug(f"hybrid search receive: {json.dumps(context)}")
                         except Exception as e:
                             log.debug(
                                 "Error when using hybrid search, using"
@@ -362,12 +360,14 @@ def get_sources_from_files(
                             )
 
                     if (not hybrid_search) or (context is None):
+                        log.debug(f"search: {collection_names} {queries}")
                         context = query_collection(
                             collection_names=collection_names,
                             queries=queries,
                             embedding_function=embedding_function,
                             k=k,
                         )
+                        log.debug(f"search receive: {json.dumps(context)}")
             except Exception as e:
                 log.exception(e)
 
@@ -394,6 +394,8 @@ def get_sources_from_files(
                     sources.append(source)
         except Exception as e:
             log.exception(e)
+
+    log.debug(f"get_sources_from_files: sources: {json.dumps(sources)}")
 
     return sources
 

@@ -402,7 +402,7 @@ async def get_all_models(request: Request) -> dict[str, list]:
         return merged_list
 
     models = {"data": merge_models_lists(map(extract_data, responses))}
-    log.debug(f"models: {models}")
+    # log.debug(f"models: {models}")
 
     request.app.state.OPENAI_MODELS = {model["id"]: model for model in models["data"]}
     return models
@@ -689,9 +689,11 @@ async def generate_chat_completion(
         else:
             try:
                 response = await r.json()
+                log.debug(f"generate_chat_completion: response: {response}")
             except Exception as e:
                 log.error(e)
                 response = await r.text()
+                log.debug(f"generate_chat_completion: response: {response}")
 
             r.raise_for_status()
             return response
