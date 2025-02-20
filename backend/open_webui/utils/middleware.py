@@ -792,14 +792,13 @@ async def process_chat_payload(request, form_data, metadata, user, model):
     # If context is not empty, insert it into the messages
     if len(sources) > 0:
         context_string = ""
-        log.debug(f"sources: {json.dumps(sources)}")
+        log.debug(f"model: {model}\nsources: {json.dumps(sources)}")
         source_idx = 0
         for _, source in enumerate(sources):
             source_type = source.get("source", {}).get("type", "")
             if "document" in source:
                 for doc_idx, doc_context in enumerate(source["document"]):
                     # Special RAG Prompt for DeepSeek tool
-                    log.info(f"model: {json.dumps(model)}")
                     if "deepseek" in model.get("id", "deepseek".lower()):
                         context_string += f"[file {source_idx} begin]\n{doc_context}\n[file {source_idx} end]\n"
                     else:
@@ -831,10 +830,14 @@ async def process_chat_payload(request, form_data, metadata, user, model):
             )
             # DeepSeek tool prompt
         elif "deepseek" in model.get("id", "deepseek".lower()):
-            tool_prompt = request.app.state.config.RAG_DEEPSEEK_TEMPLATE.replace("{{CONTEXT}}", context_string).replace("{{CURRENT_DATE}}", time.strftime("%Y-%m-%d")).replace("{{QUESTION}}", prompt)
-            log.debug(
-                f'DeepSeek tool prompt: {tool_prompt}'
+            tool_prompt = (
+                request.app.state.config.RAG_DEEPSEEK_TEMPLATE.replace(
+                    "{{CONTEXT}}", context_string
+                )
+                .replace("{{CURRENT_DATE}}", time.strftime("%Y-%m-%d"))
+                .replace("{{QUESTION}}", prompt)
             )
+            log.debug(f"DeepSeek tool prompt: {tool_prompt}")
             form_data["messages"] = prepend_to_first_user_message_content(
                 tool_prompt,
                 form_data["messages"],
