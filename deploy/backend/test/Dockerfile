@@ -35,8 +35,6 @@ ENV http_proxy="http://10.10.1.81:2345" \
 #     cd .. && \
 #     rm -rf sqlite-autoconf-3350000.tar.gz sqlite-autoconf-3350000
 
-
-
 COPY . /
 COPY deploy/backend/test/entrypoint.sh /
 RUN chmod +x /entrypoint.sh
