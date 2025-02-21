@@ -1,13 +1,3 @@
-ENABLE_PROXY ?= true                        # 默认关闭代理
-PROXY_ADDR := http://10.10.1.81:2345  # 代理服务器地址
-
-# 自动导出代理环境变量（同时兼容大小写写法）
-ifeq ($(ENABLE_PROXY), true)
-export http_proxy = $(PROXY_ADDR)
-export https_proxy = $(PROXY_ADDR)
-export HTTP_PROXY = $(PROXY_ADDR)
-export HTTPS_PROXY = $(PROXY_ADDR)
-
 PACKAGE_DIR := $(CURDIR)/package
 
 ### service
