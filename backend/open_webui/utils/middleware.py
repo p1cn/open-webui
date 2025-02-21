@@ -322,7 +322,7 @@ async def chat_web_search_handler(
         return form_data
 
     all_results = []
-    log.info(f"generate searchQuery: {searchQuery}")
+    log.info(f"generate queries: {queries}")
 
     for searchQuery in queries:
         await event_emitter(
