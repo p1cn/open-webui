@@ -7,6 +7,7 @@ export http_proxy = $(PROXY_ADDR)
 export https_proxy = $(PROXY_ADDR)
 export HTTP_PROXY = $(PROXY_ADDR)
 export HTTPS_PROXY = $(PROXY_ADDR)
+endif
 
 PACKAGE_DIR := $(CURDIR)/package
 
