@@ -21,7 +21,8 @@ ENV ENV="prod" \
     PGVECTOR_DB_URL="postgresql://dbuser_oi:lksdu7832JD%23jkYE78jd@qianshou-oidb-master.p1.cn:6432/ttx-oi" \
     RAG_EMBEDDING_ENGINE="openai" \
     RAG_EMBEDDING_MODEL="text-embedding-3-small" \
-    WEBUI_AUTH_TRUSTED_NAME_HEADER="webauth-username"
+    WEBUI_AUTH_TRUSTED_NAME_HEADER="webauth-username" \
+    WEBUI_AUTH_TRUSTED_EMAIL_HEADER="webauth-email"
 
 # RUN curl -O https://sqlite.org/2021/sqlite-autoconf-3350000.tar.gz && \
 #     tar -xvzf sqlite-autoconf-3350000.tar.gz && \
