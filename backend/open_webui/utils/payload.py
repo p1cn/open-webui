@@ -51,7 +51,8 @@ def calculate_adjusted_max_tokens(
         input_tokens = count_input_tokens(messages, model)
 
         # Calculate available tokens without considering user_max, 1000 is a buffer
-        result = max(128, max_context - input_tokens - 1000)
+        result = max(128, max_context - input_tokens - max(max_context / 10, 1000))
+        log.info(f"Calculated input tokens: {input_tokens}, max_tokens: {result}")
         return result
 
     return user_max
