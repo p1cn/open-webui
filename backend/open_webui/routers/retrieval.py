@@ -1372,13 +1372,27 @@ async def process_web_search(
             ]
 
         urls = [result.link for result in web_results]
-        loader = get_web_loader(
-            urls,
-            verify_ssl=request.app.state.config.ENABLE_RAG_WEB_LOADER_SSL_VERIFICATION,
-            requests_per_second=request.app.state.config.RAG_WEB_SEARCH_CONCURRENT_REQUESTS,
-            trust_env=True,
-        )
-        docs = await loader.aload()
+        if request.app.state.config.RAG_WEB_SEARCH_ENGINE in ('exa', 'tavily', 'jina', 'tavily+exa'):
+            docs = [
+                Document(
+                    page_content=result.snippet,
+                    metadata={
+                        "title": result.title,
+                        "source": result.link,
+                        "description": result.snippet,
+                        "language": "No language found.",
+                    },
+                )
+                for result in web_results
+            ]
+        else:
+            loader = get_web_loader(
+                urls,
+                verify_ssl=request.app.state.config.ENABLE_RAG_WEB_LOADER_SSL_VERIFICATION,
+                requests_per_second=request.app.state.config.RAG_WEB_SEARCH_CONCURRENT_REQUESTS,
+                trust_env=True,
+            )
+            docs = await loader.aload()
 
         if request.app.state.config.RAG_WEB_SEARCH_FULL_CONTEXT:
             return {
