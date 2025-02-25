@@ -23,14 +23,19 @@ def search_tavily_and_exa(
     
     def tavily_search():
         try:
-            return search_tavily(tavily_api_key, query, int(count / 2) + 1, filter_list)
+            ret = search_tavily(tavily_api_key, query, int(count / 2) + 1, filter_list)
+            log.info(f"Tavily search returned {len(ret)} results")
+            return ret
         except Exception as e:
             log.error(f"Tavily search failed: {str(e)}")
             return []
+
             
     def exa_search():
         try:
-            return search_exa(exa_api_key, query, int(count / 2), filter_list)
+            ret = search_exa(exa_api_key, query, int(count / 2), filter_list)
+            log.info(f"Exa search returned {len(ret)} results")
+            return ret
         except Exception as e:
             log.error(f"Exa search failed: {str(e)}")
             return []
