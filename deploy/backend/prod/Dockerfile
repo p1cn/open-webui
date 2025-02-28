@@ -6,7 +6,7 @@ ARG env
 ARG harbor
 ARG service
 
-FROM hub.p1.cn/cicd/lingualink_base:v1
+FROM python:3.11-slim-bookworm
 
 COPY backend/requirements.txt /
 
@@ -23,7 +23,9 @@ ENV ENV="prod" \
     RAG_EMBEDDING_MODEL="text-embedding-3-small" \
     WEBUI_AUTH_TRUSTED_NAME_HEADER="webauth-username" \
     WEBUI_AUTH_TRUSTED_EMAIL_HEADER="webauth-email" \
-    RAG_WEB_SEARCH_TRUST_ENV="true"
+    RAG_WEB_SEARCH_TRUST_ENV="true" \
+    BYPASS_WEB_SEARCH_EMBEDDING_AND_RETRIEVAL="true" \
+    BYPASS_EMBEDDING_AND_RETRIEVAL="true"
 
 # RUN curl -O https://sqlite.org/2021/sqlite-autoconf-3350000.tar.gz && \
 #     tar -xvzf sqlite-autoconf-3350000.tar.gz && \
