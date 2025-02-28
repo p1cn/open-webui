@@ -28,6 +28,18 @@ ENV ENV="test" \
     BYPASS_WEB_SEARCH_EMBEDDING_AND_RETRIEVAL="true" \
     BYPASS_EMBEDDING_AND_RETRIEVAL="true"
 
+RUN apt-get update && \
+    # Install pandoc and netcat
+    apt-get install -y --no-install-recommends git build-essential pandoc netcat-openbsd curl && \
+    # for RAG OCR
+    apt-get install -y --no-install-recommends ffmpeg libsm6 libxext6 && \
+    # install helper tools
+    apt-get install -y --no-install-recommends curl jq && \
+    # Install pandoc, netcat and gcc
+    apt-get install -y --no-install-recommends gcc python3-dev && \
+    # cleanup
+    rm -rf /var/lib/apt/lists/*;
+
 # RUN curl -O https://sqlite.org/2021/sqlite-autoconf-3350000.tar.gz && \
 #     tar -xvzf sqlite-autoconf-3350000.tar.gz && \
 #     cd sqlite-autoconf-3350000 && \
