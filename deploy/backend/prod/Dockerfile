@@ -6,7 +6,7 @@ ARG env
 ARG harbor
 ARG service
 
-FROM python:3.11-slim-bookworm
+FROM hub.p1.cn/cicd/gpt-oi-rest-base:v1
 
 COPY backend/requirements.txt /
 
@@ -39,20 +39,6 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends gcc python3-dev && \
     # cleanup
     rm -rf /var/lib/apt/lists/*;
-
-# RUN curl -O https://sqlite.org/2021/sqlite-autoconf-3350000.tar.gz && \
-#     tar -xvzf sqlite-autoconf-3350000.tar.gz && \
-#     cd sqlite-autoconf-3350000 && \
-#     ./configure --prefix=/usr && \
-#     make && \
-#     make install && \
-#     # 确保新安装的 sqlite3 覆盖旧版本
-#     ln -sf /usr/bin/sqlite3 /usr/local/bin/sqlite3 && \
-#     ln -sf /usr/lib/libsqlite3.so /usr/local/lib/libsqlite3.so && \
-#     ln -sf /usr/lib/libsqlite3.so.0 /usr/local/lib/libsqlite3.so.0 && \
-#     # 清理临时文件
-#     cd .. && \
-#     rm -rf sqlite-autoconf-3350000.tar.gz sqlite-autoconf-3350000
 
 COPY . /
 COPY deploy/backend/prod/entrypoint.sh /
