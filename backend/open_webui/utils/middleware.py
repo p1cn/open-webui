@@ -347,7 +347,7 @@ async def chat_web_search_handler(
 
             file_data = None
             if results:
-                if request.app.state.config.RAG_WEB_SEARCH_FULL_CONTEXT:
+                if request.app.state.config.BYPASS_WEB_SEARCH_EMBEDDING_AND_RETRIEVAL:
                     file_data = {
                         "docs": results.get("docs", []),
                         "name": query,
