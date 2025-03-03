@@ -1,6 +1,7 @@
 services:
   app:
     image: {{tag}}
+    privileged: true
     ports:
       - "9090:8080"                  # 固定端口映射
     volumes:
