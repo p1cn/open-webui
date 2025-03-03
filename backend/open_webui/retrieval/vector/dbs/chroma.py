@@ -103,8 +103,7 @@ class ChromaClient:
                     }
                 )
             return None
-        except Exception as e:
-            print(e)
+        except:
             return None
 
     def get(self, collection_name: str) -> Optional[GetResult]:
