@@ -352,9 +352,51 @@ def get_sources_from_files(
     hybrid_search,
     full_context=False,
 ):
-    log.debug(
-        f"files: {files} {queries} {embedding_function} {reranking_function} {full_context}"
+    log.info(
+        f"files: {json.dumps(files, ensure_ascii=False)};\nqueries: {queries}\nembedding_function: {embedding_function}\nreranking_function: {reranking_function}"
     )
+    sources = []
+    for file in files:  # 改为遍历每个文件单独处理
+        file_type = file.get("type", "file")
+
+        if file_type == "web_search_docs":
+            # 处理web_search_docs类型
+            context = {
+                "documents": [doc.get("content") for doc in file.get("docs", [])],
+                "metadatas": [doc.get("metadata") for doc in file.get("docs", [])],
+            }
+
+            # 构建source结构
+            if context.get("documents"):
+                source = {
+                    "source": {k: v for k, v in file.items() if k != "data"},
+                    "document": context["documents"],
+                    "metadata": context["metadatas"],
+                }
+                sources.append(source)
+
+        elif file_type == "file":
+            # 处理file类型
+            if "file" in file and "data" in file["file"]:
+                source = {
+                    "source": file,
+                    "document": [file["file"]["data"]["content"]],
+                    "metadata": [
+                        {
+                            "file_id": file["file"]["id"],
+                            "name": file["file"]["filename"],
+                        }
+                    ],
+                }
+                sources.append(source)
+
+        else:
+            # 处理未知类型（可选）
+            log.warning(
+                f"Unknown file type: {file_type}\nfile: {json.dumps(file,ensure_ascii=False)}"
+            )
+
+    return sources
 
     extracted_collections = []
     relevant_contexts = []

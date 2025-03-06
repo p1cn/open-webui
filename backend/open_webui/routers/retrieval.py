@@ -59,6 +59,7 @@ from open_webui.retrieval.web.serpstack import search_serpstack
 from open_webui.retrieval.web.tavily import search_tavily
 from open_webui.retrieval.web.bing import search_bing
 from open_webui.retrieval.web.exa import search_exa
+from open_webui.retrieval.web.perplexity import search_perplexity
 from open_webui.retrieval.web.tavily_exa import search_tavily_and_exa
 
 

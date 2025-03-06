@@ -1521,7 +1521,7 @@ async def process_chat_response(
 
                             data, _ = await process_filter_functions(
                                 request=request,
-                                filter_ids=filter_ids,
+                                filter_functions=filter_functions,
                                 filter_type="stream",
                                 form_data=data,
                                 extra_params=extra_params,
@@ -2118,7 +2118,7 @@ async def process_chat_response(
             for event in events:
                 event, _ = await process_filter_functions(
                     request=request,
-                    filter_ids=filter_ids,
+                    filter_functions=filter_functions,
                     filter_type="stream",
                     form_data=event,
                     extra_params=extra_params,
@@ -2130,7 +2130,7 @@ async def process_chat_response(
             async for data in original_generator:
                 data, _ = await process_filter_functions(
                     request=request,
-                    filter_ids=filter_ids,
+                    filter_functions=filter_functions,
                     filter_type="stream",
                     form_data=data,
                     extra_params=extra_params,
