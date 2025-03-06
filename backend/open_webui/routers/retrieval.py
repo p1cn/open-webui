@@ -407,6 +407,7 @@ async def get_rag_config(request: Request, user=Depends(get_admin_user)):
                 "bing_search_v7_endpoint": request.app.state.config.BING_SEARCH_V7_ENDPOINT,
                 "bing_search_v7_subscription_key": request.app.state.config.BING_SEARCH_V7_SUBSCRIPTION_KEY,
                 "exa_api_key": request.app.state.config.EXA_API_KEY,
+                "perplexity_api_key": request.app.state.config.PERPLEXITY_API_KEY,
                 "result_count": request.app.state.config.RAG_WEB_SEARCH_RESULT_COUNT,
                 "trust_env": request.app.state.config.RAG_WEB_SEARCH_TRUST_ENV,
                 "concurrent_requests": request.app.state.config.RAG_WEB_SEARCH_CONCURRENT_REQUESTS,
@@ -467,6 +468,7 @@ class WebSearchConfig(BaseModel):
     bing_search_v7_endpoint: Optional[str] = None
     bing_search_v7_subscription_key: Optional[str] = None
     exa_api_key: Optional[str] = None
+    perplexity_api_key: Optional[str] = None
     result_count: Optional[int] = None
     concurrent_requests: Optional[int] = None
     trust_env: Optional[bool] = None
@@ -619,6 +621,10 @@ async def update_rag_config(
 
         request.app.state.config.EXA_API_KEY = form_data.web.search.exa_api_key
 
+        request.app.state.config.PERPLEXITY_API_KEY = (
+            form_data.web.search.perplexity_api_key
+        )
+
         request.app.state.config.RAG_WEB_SEARCH_RESULT_COUNT = (
             form_data.web.search.result_count
         )
@@ -685,6 +691,7 @@ async def update_rag_config(
                 "bing_search_v7_endpoint": request.app.state.config.BING_SEARCH_V7_ENDPOINT,
                 "bing_search_v7_subscription_key": request.app.state.config.BING_SEARCH_V7_SUBSCRIPTION_KEY,
                 "exa_api_key": request.app.state.config.EXA_API_KEY,
+                "perplexity_api_key": request.app.state.config.PERPLEXITY_API_KEY,
                 "result_count": request.app.state.config.RAG_WEB_SEARCH_RESULT_COUNT,
                 "concurrent_requests": request.app.state.config.RAG_WEB_SEARCH_CONCURRENT_REQUESTS,
                 "trust_env": request.app.state.config.RAG_WEB_SEARCH_TRUST_ENV,
@@ -1183,10 +1190,14 @@ def process_web(
         docs = loader.load()
         content = " ".join([doc.page_content for doc in docs])
 
-        log.debug(f"process_web text_content: {content}")
-        save_docs_to_vector_db(
-            request, docs, collection_name, overwrite=True, user=user
-        )
+        log.debug(f"text_content: {content}")
+
+        if not request.app.state.config.BYPASS_WEB_SEARCH_EMBEDDING_AND_RETRIEVAL:
+            save_docs_to_vector_db(
+                request, docs, collection_name, overwrite=True, user=user
+            )
+        else:
+            collection_name = None
 
         return {
             "status": True,
@@ -1198,6 +1209,7 @@ def process_web(
                 },
                 "meta": {
                     "name": form_data.url,
+                    "source": form_data.url,
                 },
             },
         }
@@ -1223,6 +1235,7 @@ def search_web(request: Request, engine: str, query: str) -> list[SearchResult]:
     - SERPLY_API_KEY
     - TAVILY_API_KEY
     - EXA_API_KEY
+    - PERPLEXITY_API_KEY
     - SEARCHAPI_API_KEY + SEARCHAPI_ENGINE (by default `google`)
     - SERPAPI_API_KEY + SERPAPI_ENGINE (by default `google`)
     Args:
@@ -1399,6 +1412,13 @@ def search_web(request: Request, engine: str, query: str) -> list[SearchResult]:
     elif engine == "exa":
         return search_exa(
             request.app.state.config.EXA_API_KEY,
+            query,
+            request.app.state.config.RAG_WEB_SEARCH_RESULT_COUNT,
+            request.app.state.config.RAG_WEB_SEARCH_DOMAIN_FILTER_LIST,
+        )
+    elif engine == "perplexity":
+        return search_perplexity(
+            request.app.state.config.PERPLEXITY_API_KEY,
             query,
             request.app.state.config.RAG_WEB_SEARCH_RESULT_COUNT,
             request.app.state.config.RAG_WEB_SEARCH_DOMAIN_FILTER_LIST,
