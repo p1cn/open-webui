@@ -28,6 +28,8 @@ from open_webui.env import ENV
 
 from open_webui.env import SRC_LOG_LEVELS
 
+from open_webui.env import SRC_LOG_LEVELS
+
 VECTOR_LENGTH = PGVECTOR_INITIALIZE_MAX_VECTOR_LENGTH
 Base = declarative_base()
 
