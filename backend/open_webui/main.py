@@ -1025,11 +1025,7 @@ async def chat_completion(
             "files": form_data.get("files", None),
             "features": form_data.get("features", None),
             "variables": form_data.get("variables", None),
-<<<<<<< HEAD
-            "model": model_info.model_dump() if model_info else model,
-=======
             "model": model,
->>>>>>> upstream/main
             "direct": model_item.get("direct", False),
             **(
                 {"function_calling": "native"}
