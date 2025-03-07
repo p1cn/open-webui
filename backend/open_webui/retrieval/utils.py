@@ -102,32 +102,6 @@ def get_doc(collection_name: str, user: UserModel = None):
         raise e
 
 
-def get_doc(collection_name: str, user: UserModel = None):
-    try:
-        result = VECTOR_DB_CLIENT.get(collection_name=collection_name)
-
-        if result:
-            log.info(f"query_doc:result {result.ids} {result.metadatas}")
-
-        return result
-    except Exception as e:
-        log.exception(f"Error querying doc {collection_name} with limit {k}: {e}")
-        raise e
-
-
-def get_doc(collection_name: str, user: UserModel = None):
-    try:
-        result = VECTOR_DB_CLIENT.get(collection_name=collection_name)
-
-        if result:
-            log.info(f"query_doc:result {result.ids} {result.metadatas}")
-
-        return result
-    except Exception as e:
-        log.exception(f"Error getting doc {collection_name}: {e}")
-        raise e
-
-
 def query_doc_with_hybrid_search(
     collection_name: str,
     query: str,
@@ -485,6 +459,13 @@ def get_sources_from_files(
                             ]
                         ],
                     }
+            elif file.get("file").get("data"):
+                context = {
+                    "documents": [[file.get("file").get("data", {}).get("content")]],
+                    "metadatas": [
+                        [file.get("file").get("data", {}).get("metadata", {})]
+                    ],
+                }
         else:
             collection_names = []
             if file.get("type") == "collection":

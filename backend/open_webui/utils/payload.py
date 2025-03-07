@@ -129,6 +129,7 @@ def apply_model_params_to_body_openai(params: dict, form_data: dict) -> dict:
         "reasoning_effort": str,
         "seed": lambda x: x,
         "stop": lambda x: [bytes(s, "utf-8").decode("unicode_escape") for s in x],
+        "logit_bias": lambda x: x,
         "enable_max_context": bool,
         "max_context": int,
     }
@@ -136,6 +137,7 @@ def apply_model_params_to_body_openai(params: dict, form_data: dict) -> dict:
 
 
 def apply_model_params_to_body_ollama(params: dict, form_data: dict) -> dict:
+    # Convert OpenAI parameter names to Ollama parameter names if needed.
     # Convert OpenAI parameter names to Ollama parameter names if needed.
     name_differences = {
         "max_tokens": "num_predict",
